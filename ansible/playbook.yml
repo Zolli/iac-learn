@@ -1,0 +1,15 @@
+---
+
+- hosts: all
+  become: true
+  roles:
+    - role: bootstrap-node
+      tags:
+        - bootstrap
+
+- hosts: all
+  become: true
+  roles:
+    - role: tailscale
+      tags:
+        - tailscale

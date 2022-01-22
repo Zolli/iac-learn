@@ -1,0 +1,16 @@
+---
+
+- name: Update caches and upgrade
+  apt:
+    update_cache: "yes"
+    upgrade: "yes"
+
+- name: Install default packages
+  apt:
+    name: "{{ item }}"
+  loop:
+    - apt-transport-https
+    - curl
+    - jq
+    - htop
+    - gnupg2

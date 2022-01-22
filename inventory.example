@@ -1,0 +1,18 @@
+[k3s-cluster:children]
+k3s-manager
+k3s-nodes
+
+[k3s-manager]
+manager-1 ansible_ssh_host=192.168.0.10
+
+[k3s-nodes]
+node-2 ansible_ssh_host=192.168.0.10
+node-1 ansible_ssh_host=192.168.0.10
+
+[k3s-cluster:vars]
+ansible_connection=ssh
+# Change this to the user_username variable value after bootstrapping is done
+ansible_user=root
+ansible_python_interpreter="/usr/bin/env python3"
+user_username=username
+user_ssh_key_url=https://github.com/username.keys

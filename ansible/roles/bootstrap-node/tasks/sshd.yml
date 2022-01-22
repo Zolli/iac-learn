@@ -1,0 +1,58 @@
+---
+
+- name: Make sshd directory in /var/run
+  file:
+    path: /var/run/sshd
+    state: directory
+
+- name: Disable root login
+  lineinfile:
+    path: "{{ tasks.sshd.config_path }}"
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify:
+    - sshd.restart
+
+- name: Enable strict mode
+  lineinfile:
+    path: "{{ tasks.sshd.config_path }}"
+    regexp: "^#?StrictModes"
+    line: "StrictModes yes"
+    state: present
+  notify:
+    - sshd.restart
+
+- name: Disable X11 forwarding
+  lineinfile:
+    path: "{{ tasks.sshd.config_path }}"
+    regexp: "^#?X11Forwarding"
+    line: "X11Forwarding no"
+    state: present
+  notify:
+    - sshd.restart
+
+- name: Disable password authentication
+  lineinfile:
+    path: "{{ tasks.sshd.config_path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - regexp: "^#?PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^#?ChallengeResponseAuthentication"
+      line: "ChallengeResponseAuthentication no"
+    - regexp: "^#?PermitEmptyPasswords"
+      line: "PermitEmptyPasswords no"
+  notify:
+    - sshd.restart
+
+- name: Set allowed user to {{ user_username }}
+  lineinfile:
+    path: "{{ tasks.sshd.config_path }}"
+    regexp: "^#?AllowUsers"
+    line: "AllowUsers {{ user_username }}"
+    state: present
+  notify:
+    - sshd.restart

@@ -1,0 +1,7 @@
+---
+
+tasks:
+  locale:
+    timezone: "Europe/Budapest"
+  sshd:
+    config_path: "/etc/ssh/sshd_config"

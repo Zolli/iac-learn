@@ -1,0 +1,23 @@
+---
+
+- name: tailscale.enable
+  service:
+    name: tailscaled
+    state: started
+    enabled: "yes"
+
+- name: tailscale.connection
+  command:
+    argv:
+      - tailscale
+      - status
+  register: result_tailscale_status
+  notify:
+    - tailscale.assert_is_connected
+
+- name: tailscale.assert_is_connected
+  assert:
+    success_msg: "tailscale is started"
+    fail_msg: "Tailscale is not up!"
+    that:
+      - "'{{ inventory_hostname }}' in result_tailscale_status.stdout"

@@ -1,0 +1,51 @@
+---
+
+- name: Add tailscale signing key
+  apt_key:
+    url: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}.gpg"
+    state: present
+
+- name: Add tailscale APT repository
+  apt_repository:
+    repo: "deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
+    filename: "tailscale"
+    update_cache: "yes"
+    state: present
+
+- name: Install tailscale
+  apt:
+    name: tailscale
+    state: present
+    update_cache: "no"
+  notify:
+    - tailscale.enable
+
+- name: Check current status
+  command:
+    argv:
+      - tailscale
+      - status
+  failed_when: False
+  register: result_tailscale_status_before_connect
+  changed_when: False
+
+- name: Connect tailscale
+  command:
+    argv:
+      - tailscale
+      - up
+      - --authkey={{ tailscale_auth_key }}
+  notify:
+    - tailscale.connection
+  when: ('Logged out' in result_tailscale_status_before_connect.stdout) or ('stopped' in result_tailscale_status_before_connect.stdout)
+
+- name: Get IP
+  command:
+    argv:
+      - tailscale
+      - ip
+  register: result_tailscale_ip
+  changed_when: False
+
+- debug:
+    var: result_tailscale_ip.stdout
