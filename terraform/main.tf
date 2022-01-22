@@ -4,6 +4,10 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "1.32.2"
     }
+    github = {
+      source = "integrations/github"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -13,8 +17,19 @@ variable "hcloud_token" {
   sensitive   = true
 }
 
+variable "github_user" {
+  type = string
+  description = "The Github user account which first SSH key is used"
+}
+
 provider "hcloud" {
   token = var.hcloud_token
+}
+
+provider "github" {}
+
+data "github_user" "my_user" {
+  username = var.github_user
 }
 
 resource "hcloud_network" "kubernetes_network" {
@@ -36,7 +51,7 @@ resource "hcloud_placement_group" "group_spread" {
 
 resource "hcloud_ssh_key" "ssh_key_zolli" {
   name       = "key_zolli"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEx60XjFcsAk1n2C8+1RtQ/J3p+eJWlCIBCsI8LMnVoWcLdf7MgSqteAPuvUoUC5MW6AaumlDiVj0Grl5NYrgC7nm2g9dbKZJURtNtAngWqSJoDOxXLvwyuNsat2JMKnpeLPpeZVNT5EhbKnaBJ+uOZLm/ZBhx9OwTovEudKfidYt1oAd+u6rTZ5CgUP3jwJLTSYDxy4NT9W9wZMxBcR6ev90k9crs4fL4ZTReGtW/EFLoJ/X8cRX0j5A4GV4aKy/lBWgUnqMgNZJZZLGB2FnkumzjqE+c20jr6BRij82opI3/1DcQO0dzlkaSDCUcZK/kS46hfyCtJpgCBmpVohSRarTZJJUvLqjXuj7O6VJOV5FYqTDqmuJkPNHUZWzikZxn51xyYAhzcU9PnEXdaWgNaoZiyYiYyOGuyDuwSnp8/rYwSnDwGS0Y4NS63xO04rEOUNpdMbqu0EJseISAH0bz8aWka7+kBopbG58FU3SyNfxYGqIx27nuCLgvRbsH/IZDF/WmrODZJMXaK5haQeX/N28SPTTt35VFCSjGnQBMPCplH417KQVrp2SWeQgpVfo2grrRykpx9RnhKO0HgP7hdJR2TqrZ1wiGDp6kUIYqr6xXdZOm1KVGN+21eu5dNw6ndFp0DoyskXHnu7qX0dlVlHf6PbdO4wzHnHD/psTBsQ== zolli07@gmail.com"
+  public_key = data.github_user.my_user.ssh_keys.0
 }
 
 resource "hcloud_firewall" "firewall_kubernetes" {

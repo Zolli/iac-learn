@@ -8,7 +8,7 @@ tf-plan:
 
 .PHONY: tf-apply
 tf-apply:
-	terraform -chdir=./terraform apply
+	terraform -chdir=./terraform apply -var-file=../terraform.tfvars
 
 .PHONY: ansible-run
 ansible-run:
