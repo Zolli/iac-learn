@@ -49,8 +49,8 @@ resource "hcloud_placement_group" "group_spread" {
   type = "spread"
 }
 
-resource "hcloud_ssh_key" "ssh_key_zolli" {
-  name       = "key_zolli"
+resource "hcloud_ssh_key" "ssh_key" {
+  name       = "key_${var.github_user}"
   public_key = data.github_user.my_user.ssh_keys.0
 }
 
@@ -149,8 +149,11 @@ resource "hcloud_server" "master-1" {
   name               = "master-1"
   server_type        = "cx11"
   datacenter         = "nbg1-dc3"
-  ssh_keys           = ["key_zolli"]
+  ssh_keys           = ["key_${var.github_user}"]
   placement_group_id = hcloud_placement_group.group_spread.id
+  labels = {
+    role = "manager"
+  }
   firewall_ids       = [
     hcloud_firewall.firewall_kubernetes.id
   ]
