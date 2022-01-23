@@ -1,0 +1,16 @@
+[k3s-cluster:children]
+servers
+workers
+
+[servers]%{for host in servers}
+${host.server.name} ansible_ssh_host=${host.server.ipv4_address}
+%{endfor}
+[workers]%{for host in workers}
+${host.server.name} ansible_ssh_host=${host.server.ipv4_address}
+%{endfor}
+[k3s-cluster:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_python_interpreter="/usr/bin/env python3"
+user_username=${user}
+user_ssh_key_url=https://github.com/${user}.keys
